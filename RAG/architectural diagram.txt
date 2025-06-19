@@ -1,0 +1,77 @@
+[Start]
+  │
+  ▼
+[User Query Input]
+  │
+  ▼
+[Document Retrieval Phase]
+  │  (Qdrant similarity search)
+  ▼
+[Retrieve Relevant Chunks]───┐
+  │                         │
+  ▼                         │
+[Generation Phase]          │
+  ├─────────────────────────┘
+  │
+  ├──[OpenAI Path]───────────────────────────────────┐
+  │  1. Format prompt with chunks                   │
+  │  2. Call GPT-4 API                              │
+  │  3. Return response                             │
+  │                                                 │
+  └──[Fine-Tuned Model Path]────────────────────────┐
+     1. Load LoRA-adapted model                    │
+     2. Tokenize prompt with chunks                │
+     3. Process through layers:                    │
+        - Base weights                             │
+        + LoRA adjustments (lora_A * lora_B)       │
+     4. Generate tokens                            │
+     5. Decode response                            │
+     6. Return answer                              │
+  │                                                 │
+  ▼                                                 │
+[Response Output]◄──────────────────────────────────┘
+  │
+  ▼
+[End]
+
+Key Components Breakdown
+-----------------------
+
+1. Document Processing
+   │
+   ├─► [PDF Loader]
+   ├─► [Text Splitter]
+   └─► [Vector Storage]
+
+2. Fine-Tuning Preparation
+   │
+   ├─► [Base Model] (e.g., Mistral-7B)
+   ├─► [LoRA Config]
+   │   - r=8
+   │   - α=32
+   │   - target_modules=["q_proj","v_proj"]
+   └─► [Training]
+       - Batch size=4
+       - LR=3e-4
+       - Steps=1000
+
+3. Runtime Decisions
+   │
+   ├─► [Model Selector]
+   │   - Use OpenAI (default)
+   │   - Use Fine-Tuned (conditional)
+   └─► [Safety Check] (optional)
+
+Visual Connections
+-----------------
+Document Chunks ───┬──► OpenAI Prompt
+                   └──► Fine-Tuning Data
+
+LoRA Adapters ────────► Model Layers
+                        (q_proj, v_proj)
+
+Legend:
+[ ] = Process step
+├─► = Component connection
+─── = Main flow
+┌─┐ = Alternative paths
