@@ -15,7 +15,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 load_dotenv()
 
-pdf_path = Path(__file__).parent/"Data-Communications-and-Network-5e-2.pdf"
+pdf_path = Path(__file__).parent/"nodeJS.pdf"
 loader = PyPDFLoader(file_path=pdf_path)
 docs = loader.load()
 
@@ -31,15 +31,15 @@ embedder = OpenAIEmbeddings(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
-# vector_store = QdrantVectorStore.from_documents(
-#     documents=[],
-#     url="http://localhost:6333",
-#     collection_name="srip",
-#     embedding=embedder
-# )
+vector_store = QdrantVectorStore.from_documents(
+    documents=[],
+    url="http://localhost:6333",
+    collection_name="new1",
+    embedding=embedder
+)
 
-# vector_store.add_documents(documents=split_docs)
-# print("Injection Done")
+vector_store.add_documents(documents=split_docs)
+print("Injection Done")
 
 retriver = QdrantVectorStore.from_existing_collection(
     url="http://localhost:6333",
